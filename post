@@ -1,0 +1,2 @@
+#!/bin/sh
+sysrc -qf ~cbsd/etc/cloud-init-extras.conf cbsd_cloud_init=1

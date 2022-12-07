@@ -1,0 +1,76 @@
+#!/bin/sh
+pgm="${0##*/}"		# Program basename
+progdir="${0%/*}"	# Program directory
+export PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+MY_PATH="$( realpath ${progdir} )"
+
+echo "uninstall cbsd-bhyve" > /var/log/cbsd-init.log
+date >> /var/log/cbsd-init.log
+
+CONF_PATH="${MY_PATH}/../conf"
+
+if [ ! -h /usr/local/www/ext/cbsd-bhyve ]; then
+	echo "error: not symlink: /usr/local/www/ext/cbsd-bhyve ?" | tee -a /var/log/cbsd-init.log
+	exit 1
+fi
+
+EXTENSION_ROOT=$( realpath /usr/local/www/ext/cbsd-bhyve )
+if [ ! -d "${EXTENSION_ROOT}" ]; then
+	echo "error: not directory: ${EXTENSION_ROOT} ?" | tee -a /var/log/cbsd-init.log
+	exit 1
+fi
+
+# check for cbsd-bhyve specific files
+if [ ! -f "${EXTENSION_ROOT}/gui/cbsd_manager_gui.php" ]; then
+	echo "error: no such cbsd-bhyve specific file: ${EXTENSION_ROOT}/gui/cbsd_manager_gui.php" | tee -a /var/log/cbsd-init.log
+	exit 1
+fi
+
+cd /
+
+vm_list=$( cbsd border 2>/dev/null )
+
+for i in ${vm_list}; do
+	echo "cbsd bremove jname=${i}" | tee -a /var/log/cbsd-init.log
+	cbsd bremove jname=${i} | tee -a /var/log/cbsd-init.log
+done
+
+/sbin/ifconfig cbsd0 > /dev/null 2>&1
+ret=$?
+if [ ${ret} -eq 0 ]; then
+	echo "/sbin/ifconfig cbsd0 destroy" | tee -a /var/log/cbsd-init.log
+	/sbin/ifconfig cbsd0 destroy >/dev/null 2>&1
+fi
+
+sysrc cloned_interfaces-="bridge0"
+sysrc ifconfig_bridge0=""
+
+id cbsd > /dev/null 2>&1
+ret=$?
+if [ ${ret} -ne 0 ]; then
+	pw userdel cbsd 2>&1 | tee -a /var/log/cbsd-init.log
+	pw groupdel cbsd 2>&1 | tee -a /var/log/cbsd-init.log
+fi
+
+/usr/local/bin/cbsd natoff > /dev/null  2>&1
+
+
+FILES=$( /usr/bin/find ${EXTENSION_ROOT}/ -type f -name \*.php -exec basename {} \; )
+
+for file in ${FILES}; do
+	[ -h /usr/local/www/${file} ] && rm -f /usr/local/www/${file}
+done
+
+ZFS=$( /sbin/zfs list 2>/dev/null | grep 'cbsd-cloud-' | grep '\.raw' | awk '{printf $1" "}' )
+
+for i in ${ZFS}; do
+	echo "/sbin/zfs destroy ${i}" | tee -a /var/log/cbsd-init.log
+	/sbin/zfs destroy ${i} 2>&1 | tee -a /var/log/cbsd-init.log
+done
+
+[  -h /usr/local/www/ext/cbsd-bhyve ] && rm -f /usr/local/www/ext/cbsd-bhyve
+echo "rm -rf ${EXTENSION_ROOT}" | tee -a /var/log/cbsd-init.log
+rm -rf ${EXTENSION_ROOT} > /dev/null 2>&1
+pkg remove -y cbsd > /dev/null 2>&1
+
+exit 0

@@ -1,0 +1,245 @@
+#!/bin/sh
+pgm="${0##*/}"		# Program basename
+progdir="${0%/*}"	# Program directory
+MY_PATH="$( realpath ${progdir} )"
+
+CONF_PATH="${MY_PATH}/../conf"
+
+CURRENTDATE=`date -j +"%Y-%m-%d %H:%M:%S"`
+
+echo "${CURRENTDATE}: init $*" > /var/log/cbsd-init.log
+
+EXTENSION_ROOT=$( realpath /usr/local/www/ext/cbsd-bhyve )
+if [ ! -d "${EXTENSION_ROOT}" ]; then
+	echo "error: not directory: ${EXTENSION_ROOT} ?" | tee -a /var/log/cbsd-init.log
+	exit 1
+fi
+
+if [ ! -x "${EXTENSION_ROOT}/bin/usr/bin/cc" ]; then
+	echo "error: not such binaries in: ${EXTENSION_ROOT}/bin" | tee -a /var/log/cbsd-init.log
+	echo "error: try to deinstall/install extension" | tee -a /var/log/cbsd-init.log
+	exit 1
+fi
+
+# rc.d
+rcd_update=0
+if [ -r "${MY_PATH}/../rc.d/cbsdd" ]; then
+	if [ -r "/usr/local/etc/rc.d/cbsdd" ]; then
+		is_diff=$( diff "/usr/local/etc/rc.d/cbsdd" "${MY_PATH}/../rc.d/cbsdd" )
+		[ -n "${is_diff}" ] && rcd_update="1"
+	else
+		rcd_update="1"
+	fi
+fi
+
+if [ "${rcd_update}" = "1" ]; then
+	cp -a "${MY_PATH}/../rc.d/cbsdd" /usr/local/etc/rc.d/cbsdd
+	chmod +x /usr/local/etc/rc.d/cbsdd
+fi
+
+# module conflict
+for i in vboxdrv vboxnetadp vboxnetflt; do
+	if kldstat -qm ${i} >/dev/null 2>&1; then
+		echo "Module confict: please unload module first: ${i}" | tee -a /var/log/cbsd-init.log
+		exit 1
+	fi
+done
+
+for i in vmm if_tuntap if_bridge nmdm; do
+	if ! kldstat -qm ${i} >/dev/null 2>&1; then
+		echo "load module: ${i}" | tee -a /var/log/cbsd-init.log
+		kldload ${i} | tee -a /var/log/cbsd-init.log
+	fi
+done
+
+grep kld_list /etc/rc.conf 2>/dev/null | grep -q vmm.ko > /dev/null
+ret=$?
+if [ ${ret} -ne 0 ]; then
+	sysrc kld_list+="vmm if_tuntap if_bridge nmdm"
+fi
+
+sysrc -q cbsdd_enable="YES" > /dev/null 2>&1
+
+/sbin/ifconfig cbsd0 > /dev/null 2>&1
+ret=$?
+if [ ${ret} -ne 0 ]; then
+	echo "/sbin/ifconfig bridge0 create description CBSD" | tee -a /var/log/cbsd-init.log
+	/sbin/ifconfig bridge0 create description CBSD
+	echo "/sbin/ifconfig bridge0 name cbsd0" | tee -a /var/log/cbsd-init.log
+	/sbin/ifconfig bridge0 name cbsd0
+	echo "/sbin/ifconfig cbsd0 up" | tee -a /var/log/cbsd-init.log
+	/sbin/ifconfig cbsd0 up
+fi
+
+new_workdir=0
+
+if [ -r "${CONF_PATH}/workdir.new" ]; then
+	WORKDIR=$( grep . ${CONF_PATH}/workdir.new | awk '{printf $1}' )
+	new_workdir=1
+elif [ -r "${CONF_PATH}/workdir" ]; then
+	WORKDIR=$( grep . ${CONF_PATH}/workdir | awk '{printf $1}' )
+fi
+
+# last chance: get cbsd_workdir from rc.conf
+if [ -z "${WORKDIR}" ]; then
+	. /etc/rc.conf
+	if [ -z "${cbsd_workdir}" ]; then
+		echo "error: no such CBSD workdir" | tee -a /var/log/cbsd-init.log
+		exit 1
+	fi
+
+	WORKDIR="${cbsd_workdir}"
+fi
+id cbsd > /dev/null 2>&1
+ret=$?
+if [ ${ret} -ne 0 ]; then
+	pw useradd cbsd -u 150 -s /bin/sh -d /nonexistent -c "cbsd user"
+fi
+
+pw usermod cbsd -d ${WORKDIR}
+
+if [ -r "${CONF_PATH}/gw4.new" ]; then
+	GW4=$( grep . ${CONF_PATH}/gw4.new | awk '{printf $1}' )
+	/sbin/ifconfig cbsd0 inet ${GW4}/24
+	/bin/mv ${CONF_PATH}/gw4.new ${CONF_PATH}/gw4
+elif [ -r "${CONF_PATH}/gw4" ]; then
+	GW4=$( grep . ${CONF_PATH}/gw4 | awk '{printf $1}' )
+fi
+
+if [ -r "${CONF_PATH}/rdr.new" ]; then
+	grep -q ^yes ${CONF_PATH}/rdr.new > /dev/null 2>&1
+	ret=$?
+	if [ ${ret} -eq 0 ]; then
+		cbsd_rdr="1"
+	else
+		cbsd_rdr="0"
+	fi
+	mv ${CONF_PATH}/rdr.new ${CONF_PATH}/rdr
+elif [ -r "${CONF_PATH}/rdr" ]; then
+	grep -q ^yes ${CONF_PATH}/rdr > /dev/null 2>&1
+	ret=$?
+	if [ ${ret} -eq 0 ]; then
+		cbsd_rdr="1"
+	else
+		cbsd_rdr="0"
+	fi
+else
+	cbsd_rdr="0"
+fi
+
+if [ -r "${CONF_PATH}/nat.new" ]; then
+	grep -q ^yes ${CONF_PATH}/nat.new > /dev/null 2>&1
+	ret=$?
+	if [ ${ret} -eq 0 ]; then
+		cbsd_nat="1"
+	else
+		cbsd_nat="0"
+	fi
+	mv ${CONF_PATH}/nat.new ${CONF_PATH}/nat
+elif [ -r "${CONF_PATH}/nat" ]; then
+	grep -q ^yes ${CONF_PATH}/nat > /dev/null 2>&1
+	ret=$?
+	if [ ${ret} -eq 0 ]; then
+		cbsd_nat="1"
+	else
+		cbsd_nat="0"
+	fi
+else
+	cbsd_nat="0"
+fi
+
+grep -q bridge0 /etc/rc.conf > /dev/null
+ret=$?
+if [ ${ret} -ne 0 ]; then
+	sysrc cloned_interfaces+="bridge0"
+fi
+sysrc ifconfig_bridge0="inet ${GW4}/24 up name cbsd0"
+
+if [ -r "${CONF_PATH}/net.new" ]; then
+	NET=$( grep . ${CONF_PATH}/net.new | awk '{printf $1}' )
+	/bin/mv ${CONF_PATH}/net.new ${CONF_PATH}/net
+elif [ -r "${CONF_PATH}/net" ]; then
+	NET=$( grep . ${CONF_PATH}/net | awk '{printf $1}' )
+fi
+
+if [ ! -r ~cbsd/nc.inventory ]; then
+	cp -a /usr/local/cbsd/share/initenv.conf /tmp/initenv.conf
+fi
+
+if [ "${cbsd_nat}" = "1" ]; then
+	uplink_iface4=$( route -n get 0.0.0.0 2>/dev/null | awk '/interface/{print $2}' )
+else
+	uplink_iface4=
+fi
+
+nat_enable="0"
+
+if [ "${cbsd_nat}" = "1" ]; then
+	if [ -n "${uplink_iface4}" ]; then
+		natip=$( /sbin/ifconfig ${uplink_iface4} | /usr/bin/awk '/inet [0-9]+/{print $2}'| /usr/bin/head -n1 )
+		if [ -z "${natip}" ]; then
+			natip="0"
+			cbsd_nat="0"
+		else
+			nat_enable="pf"
+		fi
+	fi
+fi
+
+if [ "${cbsd_rdr}" = "1" ]; then
+	[ ! -d  ${WORKDIR}/share/bhyve-system-default/master_poststart.d ] && mkdir -p ${WORKDIR}/share/bhyve-system-default/master_poststart.d
+	cp ${MY_PATH}/expose.sh ${WORKDIR}/share/bhyve-system-default/master_poststart.d/expose.sh
+	chmod +x ${WORKDIR}/share/bhyve-system-default/master_poststart.d/expose.sh
+else
+	[ -r ${WORKDIR}/share/bhyve-system-default/master_poststart.d/expose.sh ] && rm -f ${WORKDIR}/share/bhyve-system-default/master_poststart.d/expose.sh
+	find ${WORKDIR}/jails-system/ -type l -depth 3 -maxdepth 3 -name vnc_port2 -delete
+fi
+
+sysrc -qf /tmp/initenv.conf nodeippool="${NET}" \
+	nodeip6pool="" \
+	nat_enable="${nat_enable}" \
+	nodeip="${natip}" \
+	natip="${natip}" \
+	ipfw_enable="0" \
+	post_cbsd_cmd_path="${EXTENSION_ROOT}/bin/sbin:${EXTENSION_ROOT}/bin/usr/bin:${EXTENSION_ROOT}/bin/usr/sbin" \
+	workdir="${WORKDIR}" | tee -a /var/log/cbsd-init.log
+
+/usr/local/cbsd/sudoexec/initenv /tmp/initenv.conf 2>&1 | tee -a /var/log/cbsd-init.log
+
+cbsd_version=$( /usr/local/bin/cbsd version 2>&1 )
+ret=$?
+if [ ${ret} -eq 0 ]; then
+	echo "CBSD version: ${cbsd_version}" | tee -a /var/log/cbsd-init.log
+else
+	echo "error: cbsd version failed"
+	exit 1
+fi
+
+if [ "${cbsd_nat}" = "1" ]; then
+	/usr/local/bin/cbsd naton 2>&1 | tee -a /var/log/cbsd-init.log
+else
+	/usr/local/bin/cbsd natoff 2>&1 | tee -a /var/log/cbsd-init.log
+fi
+
+if [ ${new_workdir} -eq 1 ]; then
+	/bin/mv ${CONF_PATH}/workdir.new ${CONF_PATH}/workdir
+fi
+
+grep -q cbsd_clout_init ~cbsd/etc/cloud-init-extras.conf > /dev/null 2>&1
+ret=$?
+if [ ${ret} -ne 0 ]; then
+	sysrc -qf ~cbsd/etc/cloud-init-extras.conf cbsd_cloud_init=1 > /dev/null 2>&1
+fi
+
+grep -q create_cbsdsystem_tap= ~cbsd/etc/bhyve-default-default.conf > /dev/null 2>&1
+ret=$?
+if [ ${ret} -ne 0 ]; then
+	sysrc -qf ~cbsd/etc/bhyve-default-default.conf create_cbsdsystem_tap=0 > /dev/null 2>&1
+fi
+
+grep -q \"${GW4}\" ~cbsd/etc/bhyve-default-default.conf > /dev/null 2>&1
+if [ ${ret} -ne 0 ]; then
+	sysrc -qf ~cbsd/etc/bhyve-default-default.conf default_ci_gw4="${GW4}" ci_gw4="${GW4}" > /dev/null 2>&1
+fi
+
+exit 0
