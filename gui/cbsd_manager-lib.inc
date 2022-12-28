@@ -24,11 +24,14 @@ if(empty($cbsd_version)):
 	endif;
 endif;
 
-$extension_version = "13.1.16.0";
 $application = "cbsd Manager";
 $confdir = "/var/etc/cbsd_conf";
 $rootfolder = "/usr/local/www/ext/cbsd-bhyve";
 $configfile = "$rootfolder/conf/cbsd_config";
+
+$extension_version = "13.1.16.0";
+$extension_version=trim(file_get_contents("{$rootfolder}/ver"));
+
 $configfile_cbsd = "$rootfolder/cbsd-dist/usr/local/etc/cbsd/cbsd.conf";
 $date = date('D M d h:i:s Y', time());   // Equivalent date replacement for the previous strftime function.
 $logfile = "$rootfolder/log/cbsd_ext.log";
