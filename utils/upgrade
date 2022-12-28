@@ -59,7 +59,7 @@ echo "Done!" | tee -a /var/log/cbsd-upgrade.log
 
 [ ! -r "${UPGRADE_ROOT}/ver" -a ! -r "${UPGRADE_ROOT}/gui/cbsd_manager-lib.inc" ] && err 1 "no such ${UPGRADE_ROOT}/ver and ${UPGRADE_ROOT}/gui/cbsd_manager-lib.inc: wrong hier ?"
 
-/usr/local/bin/rsync -avz --exclude .git --exclude log --exclude conf --exclude bin --exclude pubkey --exclude utils/upgrade ${UPGRADE_ROOT}/ ${EXTENSION_ROOT}/ 2>/dev/null | tee -a /var/log/cbsd-upgrade.log
+/usr/local/bin/rsync -avz --exclude .git --exclude log --exclude conf --exclude bin --exclude pubkey --exclude utils/upgrade --delete ${UPGRADE_ROOT}/ ${EXTENSION_ROOT}/ 2>/dev/null | tee -a /var/log/cbsd-upgrade.log
 
 [ ! -d /usr/local/www/ext ] && mkdir -p /usr/local/www/ext
 [ ! -h /usr/local/www/ext/cbsd-bhyve ] && ln -sf ${EXTENSION_DIR} /usr/local/www/ext/cbsd-bhyve
