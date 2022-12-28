@@ -1,5 +1,5 @@
 #!/bin/sh
-# 13.1.20.1
+# 13.1.20.2
 pgm="${0##*/}"		# Program basename
 progdir="${0%/*}"	# Program directory
 export PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
