@@ -11,8 +11,7 @@ if ($_POST) {
 	global $backup_path_cbsd;
 	global $configfile_cbsd;
 
-	// Remove only extension related files during cleanup.
-	if (isset($_POST['uninstall']) && $_POST['uninstall']) {
+	if(isset($_POST['uninstall']) && $_POST['uninstall']):
 		if(isset($_POST['delete_confirm']) && $_POST['delete_confirm']):
 			bindtextdomain("xigmanas", $textdomain);
 			mwexec("/usr/local/www/ext/cbsd-bhyve/utils/uninstall", true);
@@ -20,7 +19,26 @@ if ($_POST) {
 		else:
 			$input_errors[] = gtext('Confirmation is required for extension removal.');
 		endif;
-	}
+	endif;
+
+	if(isset($_POST['upgrade']) && $_POST['upgrade']):
+		$cmd = sprintf('%1$s/utils/upgrade > %2$s',$rootfolder,$logevent);
+		$return_val = 0;
+		$output = [];
+		exec($cmd,$output,$return_val);
+		if($return_val == 0):
+			ob_start();
+			include("{$logevent}");
+			$ausgabe = ob_get_contents();
+			ob_end_clean();
+			$savemsg .= str_replace("\n", "<br />", $ausgabe)."<br />";
+		else:
+			$input_errors[] = gtext('An error has occurred during upgrade process.');
+			$cmd = sprintf('echo %s: %s An error has occurred during upgrade process. >> %s',$date,$application,$logfile);
+			exec($cmd);
+		endif;
+	endif;
+
 }
 
 function get_version_ext() {
@@ -99,6 +117,9 @@ endif;
 					<td class="vtable"><span name="getinfo_ext" id="getinfo_ext"><?=get_version_ext()?></span></td>
 				</tr>
 			</table>
+			<div id="submit">
+				<input name="upgrade" type="submit" class="formbtn" title="<?=gtext("Upgrade Extension");?>" value="<?=gtext("Upgrade");?>" />
+			</div>
 			<div id="remarks">
 				<?php html_remark("note", gtext("Info"), sprintf(gtext("For general information visit the following link(s):")));?>
 				<div id="enumeration"><ul><li><a href="https://www.bsdstore.ru/en/" target="_blank" ><?=gtext("CBSD framework.")?></a></li></ul></div>
