@@ -19,19 +19,17 @@ majorver=${ver%%.*}
 unset tmpver
 
 if [ ! -x "${CBSD_CMD}" ]; then
-	echo "No such cbsd executable, install via pkg.."
+	echo "No such cbsd executable, installing via pkg.."
 
-	#env SIGNATURE_TYPE=none ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg install -y cbsd
+	env SIGNATURE_TYPE=none ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg install -y tmux cbsd
 
-	# devel
-	env SIGNATURE_TYPE=none ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg install -y sudo libssh2 rsync sqlite3
-	rootfs_url="https://www.bsdstore.ru/downloads/xigma/${majorver}/cbsd-13.1.19.a.pkg"
-	fetch -o cbsd.pkg ${rootfs_url}
-	pkg install -y ./cbsd.pkg
-	rm -f ./cbsd.pkg
+	# for devel
+	# env SIGNATURE_TYPE=none ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg install -y sudo libssh2 rsync sqlite3 tmux git
+	#rootfs_url="https://www.bsdstore.ru/downloads/xigma/${majorver}/cbsd-13.1.19.a.pkg"
+	#fetch -o cbsd.pkg ${rootfs_url}
+	#pkg install -y ./cbsd.pkg
+	#rm -f ./cbsd.pkg
 fi
-
-hash -r
 
 CBSD_CMD=$( which cbsd 2>/dev/null )
 
