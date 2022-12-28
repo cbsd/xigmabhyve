@@ -1,5 +1,5 @@
 #!/bin/sh
-# 13.1.20.2
+# 13.1.20.3
 pgm="${0##*/}"		# Program basename
 progdir="${0%/*}"	# Program directory
 export PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
@@ -17,7 +17,7 @@ ver=${tmpver%%-*}
 majorver=${ver%%.*}
 unset tmpver
 
-echo "uninstall cbsd-bhyve" > /var/log/cbsd-upgrade.log
+echo "upgrade cbsd-bhyve" > /var/log/cbsd-upgrade.log
 date >> /var/log/cbsd-upgrade.log
 
 CONF_PATH="${MY_PATH}/../conf"
@@ -74,14 +74,17 @@ done
 echo "Congratulations! The CBSD-bhyve extension was upgraded to ${latest_ver}" | tee -a /var/log/cbsd-upgrade.log
 
 # base files
-if [ ! -x ${EXTENSION_DIR}/bin/sbin/pfctl ]; then
-	echo "Fetch system binary dependencies for FreeBSD ${majorver} [${EXTENSION_DIR}]..." | tee -a /var/log/cbsd-upgrade.log
+if [ ! -x ${EXTENSION_ROOT}/bin/sbin/pfctl ]; then
+	echo "no such ${EXTENSION_ROOT}/bin/sbin/pfctl" | tee -a /var/log/cbsd-upgrade.log
+	echo "Fetch system binary dependencies for FreeBSD ${majorver} [${EXTENSION_ROOT}]..." | tee -a /var/log/cbsd-upgrade.log
 
-	cd ${EXTENSION_DIR}
+	cd ${EXTENSION_ROOT}
 	rootfs_url="https://www.bsdstore.ru/downloads/xigma/${majorver}/xigma-rootfs.tgz"
 	fetch ${rootfs_url} | tee -a /var/log/cbsd-upgrade.log
-	[ ! -s ${EXTENSION_DIR}/xigma-rootfs.tgz ] && err 1 "unable to fetch ${rootfs_url}: no such ${EXTENSION_DIR}/xigma-rootfs.tgz"
+	[ ! -s ${EXTENSION_ROOT}/xigma-rootfs.tgz ] && err 1 "unable to fetch ${rootfs_url}: no such ${EXTENSION_ROOT}/xigma-rootfs.tgz"
 	tar xfz xigma-rootfs.tgz && rm -f xigma-rootfs.tgz
+	# delete old bin/ dir
+	[ -d "${EXTENSION_ROOT}/bin" ] && /bin/rm -rf ${EXTENSION_ROOT}/bin
 	mv xigma-rootfs bin
 	hash -r
 fi
