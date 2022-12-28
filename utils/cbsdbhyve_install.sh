@@ -13,7 +13,7 @@ err() {
 export PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 CBSD_CMD=$( which cbsd 2>/dev/null )
 
-tmpver=$( uname -r )
+tmpver=$( /usr/bin/uname -r )
 ver=${tmpver%%-*}
 majorver=${ver%%.*}
 unset tmpver

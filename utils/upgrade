@@ -1,0 +1,92 @@
+#!/bin/sh
+# 13.1.20.1
+pgm="${0##*/}"		# Program basename
+progdir="${0%/*}"	# Program directory
+export PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+MY_PATH="$( realpath ${progdir} )"
+
+err() {
+	exitval=$1
+	shift
+	echo "$*" 1>&2 | tee -a /var/log/cbsd-upgrade.log
+	exit ${exitval}
+}
+
+tmpver=$( /usr/bin/uname -r )
+ver=${tmpver%%-*}
+majorver=${ver%%.*}
+unset tmpver
+
+echo "uninstall cbsd-bhyve" > /var/log/cbsd-upgrade.log
+date >> /var/log/cbsd-upgrade.log
+
+CONF_PATH="${MY_PATH}/../conf"
+
+[ ! -h /usr/local/www/ext/cbsd-bhyve ] && err 1 "error: not symlink: /usr/local/www/ext/cbsd-bhyve ?"
+
+EXTENSION_ROOT=$( realpath /usr/local/www/ext/cbsd-bhyve )
+[ ! -d "${EXTENSION_ROOT}" ] && err 1 "error: not directory: ${EXTENSION_ROOT} ?"
+
+# check for cbsd-bhyve specific files
+[ ! -f "${EXTENSION_ROOT}/gui/cbsd_manager_gui.php" ] && err 1 "error: no such cbsd-bhyve specific file: ${EXTENSION_ROOT}/gui/cbsd_manager_gui.php"
+
+cd /tmp
+UPGRADE_ROOT=$( /usr/bin/mktemp -d )
+/usr/sbin/chown nobody ${UPGRADE_ROOT}
+trap "/bin/rm -rf ${UPGRADE_ROOT}" HUP INT ABRT BUS TERM EXIT
+_metadata_tmp="${UPGRADE_ROOT}/latest"
+_gh_raw_ver="https://raw.githubusercontent.com/cbsd/xigmabhyve/main/ver"
+/usr/bin/su -m nobody -c "/usr/bin/fetch -q -o ${_metadata_tmp} ${_gh_raw_ver}" | tee -a /var/log/cbsd-upgrade.log
+
+latest_ver=$( /usr/bin/grep . ${_metadata_tmp} | awk '{printf $1}' )
+current_ver=$( /usr/bin/grep . ${EXTENSION_ROOT}/ver | awk '{printf $1}' )
+
+echo "current/latest version: [${current_ver}/${latest_ver}]" | tee -a /var/log/cbsd-upgrade.log
+
+[ "${current_ver}" = "${latest_ver}" ] && err 0 "There are no updates, you are using the latest version"
+
+# dup code: todo: merge/share code to/with cbsdbhyve_install.sh
+echo "Retrieving the cbsdbhyve as a zip file" | tee -a /var/log/cbsd-upgrade.log
+cd ${UPGRADE_ROOT}
+/usr/bin/fetch https://github.com/cbsd/xigmabhyve/archive/main.zip || err 1 "ERROR: Could not write to install directory!"
+
+# Extract the files we want, stripping the leading directory, and exclude
+# the git nonsense
+echo "Unpacking the tarball..." | tee -a /var/log/cbsd-upgrade.log
+/usr/bin/tar -xf main.zip --exclude='.git*' --strip-components 1 | tee -a /var/log/cbsd-upgrade.log
+echo "Done!" | tee -a /var/log/cbsd-upgrade.log
+/bin/rm main.zip
+
+[ ! -r "${UPGRADE_ROOT}/ver" -a ! -r "${UPGRADE_ROOT}/gui/cbsd_manager-lib.inc" ] && err 1 "no such ${UPGRADE_ROOT}/ver and ${UPGRADE_ROOT}/gui/cbsd_manager-lib.inc: wrong hier ?"
+
+/usr/local/bin/rsync -avz --exclude .git --exclude log --exclude conf --exclude bin --exclude pubkey --exclude utils/upgrade ${UPGRADE_ROOT}/ ${EXTENSION_ROOT}/ 2>/dev/null | tee -a /var/log/cbsd-upgrade.log
+
+[ ! -d /usr/local/www/ext ] && mkdir -p /usr/local/www/ext
+[ ! -h /usr/local/www/ext/cbsd-bhyve ] && ln -sf ${EXTENSION_DIR} /usr/local/www/ext/cbsd-bhyve
+cd /usr/local/www
+# For each of the php files in the extensions folder
+for file in ${EXTENSION_DIR}/gui/*.php; do
+	echo "ln -sf \"$file\" \"${file##*/}\"" | tee -a /var/log/cbsd-upgrade.log
+	# Create link
+	ln -sf "$file" "${file##*/}" | tee -a /var/log/cbsd-upgrade.log
+done
+
+echo "Congratulations! The CBSD-bhyve extension was upgraded to ${latest_ver}" | tee -a /var/log/cbsd-upgrade.log
+
+# base files
+if [ ! -x ${EXTENSION_DIR}/bin/sbin/pfctl ]; then
+	echo "Fetch system binary dependencies for FreeBSD ${majorver} [${EXTENSION_DIR}]..." | tee -a /var/log/cbsd-upgrade.log
+
+	cd ${EXTENSION_DIR}
+	rootfs_url="https://www.bsdstore.ru/downloads/xigma/${majorver}/xigma-rootfs.tgz"
+	fetch ${rootfs_url} | tee -a /var/log/cbsd-upgrade.log
+	[ ! -s ${EXTENSION_DIR}/xigma-rootfs.tgz ] && err 1 "unable to fetch ${rootfs_url}: no such ${EXTENSION_DIR}/xigma-rootfs.tgz"
+	tar xfz xigma-rootfs.tgz && rm -f xigma-rootfs.tgz
+	mv xigma-rootfs bin
+	hash -r
+fi
+
+# finally update upgrade script
+/bin/mv -f ${UPGRADE_ROOT}/utils/upgrade ${EXTENSION_ROOT}/utils/
+
+exit 0
