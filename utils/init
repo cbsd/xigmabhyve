@@ -15,7 +15,7 @@ if [ ! -d "${EXTENSION_ROOT}" ]; then
 	exit 1
 fi
 
-if [ ! -x "${EXTENSION_ROOT}/bin/usr/bin/cc" ]; then
+if [ ! -x "${EXTENSION_ROOT}/bin/sbin/pfctl" ]; then
 	echo "error: not such binaries in: ${EXTENSION_ROOT}/bin" | tee -a /var/log/cbsd-init.log
 	echo "error: try to deinstall/install extension" | tee -a /var/log/cbsd-init.log
 	exit 1
