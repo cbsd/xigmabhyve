@@ -320,8 +320,8 @@ $document->render();
 <?php
 					else:
 ?>
-<!--					<td class="lcell"><a target="_blank" href="/cbsd_bttyd.php?jname=<?php echo "${jname}";?>&jid=<?=htmlspecialchars($sphere_record['id']);?>"><img src="/ext/cbsd-jail/images/terminal.png" alt="Terminal" width="24" height="24"></a>&nbsp;&nbsp;<?=htmlspecialchars($sphere_record['vnc']);?>&nbsp;</td> -->
-					<td class="lcell"><img src="/ext/cbsd-jail/images/terminal.png" alt="Terminal" width="24" height="24">&nbsp;&nbsp;<input type="text" minlength="<?=$vnc_len;?>" maxlength="<?=$vnc_len;?>" size="<?=$vnc_len;?>"  value="<?=htmlspecialchars($sphere_record['vnc']);?>" readonly></td>
+<!--					<td class="lcell"><img src="/ext/cbsd-jail/images/terminal.png" alt="Terminal" width="24" height="24"></a>&nbsp;&nbsp;<?=htmlspecialchars($sphere_record['vnc']);?>&nbsp;</td> -->
+					<td class="lcell"><a target="_blank" href="/cbsd_bttyd.php?jname=<?php echo "${jname}";?>&jid=<?=htmlspecialchars($sphere_record['id']);?>"><img src="/ext/cbsd-jail/images/terminal.png" alt="Terminal" width="24" height="24"></a>&nbsp;&nbsp;<input type="text" minlength="<?=$vnc_len;?>" maxlength="<?=$vnc_len;?>" size="<?=$vnc_len;?>"  value="<?=htmlspecialchars($sphere_record['vnc']);?>" readonly></td>
 <?php
 					endif;
 ?>

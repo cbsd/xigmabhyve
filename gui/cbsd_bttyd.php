@@ -2,7 +2,7 @@
 //TODO: Implement STREAM proxy to ttyd.sock unix socket instead of BASIC AUTH
 require_once 'auth.inc';
 require_once 'guiconfig.inc';
-require_once("cbsd_manager-lib.inc");
+require_once("cbsd_bmanager-lib.inc");
 
 if($_GET):
 	if(isset($_GET['jid'])):

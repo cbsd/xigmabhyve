@@ -116,10 +116,10 @@ if($_POST):
 			$astart="0";
 		endif;
 
+		$cmd = "/usr/local/bin/cbsd bcreate jname={$jname} astart={$astart} vm_ram={$ram} vm_cpus={$cpu} vm_os_type={$vm_os_type} vm_os_profile={$vm_os_profile} imgsize={$imgsize} bhyve_vnc_tcp_bind={$vnc_bind} ci_ip4_addr={$ipaddr} ci_user_pubkey=\".ssh/authorized_keys\" ci_user_pubkey2=\"{$rootfolder}/pubkey/default\"";
+
 		if (isset($_POST['nowstart'])):
-			$cmd = ("/usr/local/bin/cbsd bcreate jname={$jname} astart={$astart} vm_ram={$ram} vm_cpus={$cpu} vm_os_type={$vm_os_type} vm_os_profile={$vm_os_profile} imgsize={$imgsize} bhyve_vnc_tcp_bind={$vnc_bind} ci_ip4_addr={$ipaddr} ci_user_pubkey=\"{$rootfolder}/pubkey/default\" runasap=1");
-		else:
-			$cmd = ("/usr/local/bin/cbsd bcreate jname={$jname} astart={$astart} vm_ram={$ram} vm_cpus={$cpu} vm_os_type={$vm_os_type} vm_os_profile={$vm_os_profile} imgsize={$imgsize} bhyve_vnc_tcp_bind={$vnc_bind} ci_ip4_addr={$ipaddr} ci_user_pubkey=\"{$rootfolder}/pubkey/default\"");
+			$cmd .= " runasap=1";
 		endif;
 
 		if ($_POST['Create']):
