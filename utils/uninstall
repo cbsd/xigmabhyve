@@ -35,25 +35,34 @@ for i in ${vm_list}; do
 	cbsd bremove jname=${i} | tee -a /var/log/cbsd-init.log
 done
 
-/sbin/ifconfig cbsd0 > /dev/null 2>&1
-ret=$?
-if [ ${ret} -eq 0 ]; then
-	echo "/sbin/ifconfig cbsd0 destroy" | tee -a /var/log/cbsd-init.log
-	/sbin/ifconfig cbsd0 destroy >/dev/null 2>&1
+# another CBSD consumer exist?
+uninstall_cbsd=1
+
+if [ -h /usr/local/www/ext/cbsd-jail ]; then
+	uninstall_cbsd=0
 fi
 
-sysrc cloned_interfaces-="bridge0"
-sysrc ifconfig_bridge0=""
+if [ ${uninstall_cbsd} -eq 1 ]; then
+	/sbin/ifconfig cbsd0 > /dev/null 2>&1
+	ret=$?
+	if [ ${ret} -eq 0 ]; then
+		echo "/sbin/ifconfig cbsd0 destroy" | tee -a /var/log/cbsd-init.log
+		/sbin/ifconfig cbsd0 destroy >/dev/null 2>&1
+	fi
 
-id cbsd > /dev/null 2>&1
-ret=$?
-if [ ${ret} -ne 0 ]; then
-	pw userdel cbsd 2>&1 | tee -a /var/log/cbsd-init.log
-	pw groupdel cbsd 2>&1 | tee -a /var/log/cbsd-init.log
+	sysrc cloned_interfaces-="bridge0"
+	sysrc ifconfig_bridge0=""
+
+	id cbsd > /dev/null 2>&1
+	ret=$?
+	if [ ${ret} -ne 0 ]; then
+		pw userdel cbsd 2>&1 | tee -a /var/log/cbsd-init.log
+		pw groupdel cbsd 2>&1 | tee -a /var/log/cbsd-init.log
+	fi
+
+	/usr/local/bin/cbsd natoff > /dev/null  2>&1
+	pkg remove -y cbsd > /dev/null 2>&1
 fi
-
-/usr/local/bin/cbsd natoff > /dev/null  2>&1
-
 
 FILES=$( /usr/bin/find ${EXTENSION_ROOT}/ -type f -name \*.php -exec basename {} \; )
 
@@ -71,6 +80,5 @@ done
 [  -h /usr/local/www/ext/cbsd-bhyve ] && rm -f /usr/local/www/ext/cbsd-bhyve
 echo "rm -rf ${EXTENSION_ROOT}" | tee -a /var/log/cbsd-init.log
 rm -rf ${EXTENSION_ROOT} > /dev/null 2>&1
-pkg remove -y cbsd > /dev/null 2>&1
 
 exit 0
