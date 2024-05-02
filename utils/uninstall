@@ -21,8 +21,8 @@ if [ ! -d "${EXTENSION_ROOT}" ]; then
 fi
 
 # check for cbsd-bhyve specific files
-if [ ! -f "${EXTENSION_ROOT}/gui/cbsd_manager_gui.php" ]; then
-	echo "error: no such cbsd-bhyve specific file: ${EXTENSION_ROOT}/gui/cbsd_manager_gui.php" | tee -a /var/log/cbsd-init.log
+if [ ! -f "${EXTENSION_ROOT}/gui/cbsd_bmanager_gui.php" ]; then
+	echo "error: no such cbsd-bhyve specific file: ${EXTENSION_ROOT}/gui/cbsd_bmanager_gui.php" | tee -a /var/log/cbsd-init.log
 	exit 1
 fi
 

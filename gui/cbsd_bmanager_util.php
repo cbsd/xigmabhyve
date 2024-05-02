@@ -1,7 +1,7 @@
 <?php
 require_once 'auth.inc';
 require_once 'guiconfig.inc';
-require_once("cbsd_manager-lib.inc");
+require_once("cbsd_bmanager-lib.inc");
 
 if(isset($_GET['uuid'])):
 	$uuid = $_GET['uuid'];
@@ -40,7 +40,7 @@ if($_POST):
 	unset($input_errors);
 	$pconfig = $_POST;
 	if(isset($_POST['Cancel']) && $_POST['Cancel']):
-		header('Location: cbsd_manager_gui.php');
+		header('Location: cbsd_bmanager_gui.php');
 		exit;
 	endif;
 	if(isset($_POST['action'])):
@@ -61,7 +61,7 @@ if($_POST):
 					$cmd = ("/usr/local/bin/cbsd bset astart=1 jname={$item}");
 					unset($output,$retval);mwexec2($cmd,$output,$retval);
 					if($retval == 0):
-						header('Location: cbsd_manager_gui.php');
+						header('Location: cbsd_bmanager_gui.php');
 						exit;
 					else:
 						$input_errors[] = gtext("Failed to set auto-boot.");
@@ -80,7 +80,7 @@ if($_POST):
 					$cmd = ("/usr/local/bin/cbsd bset astart=0 jname={$item}");
 					unset($output,$retval);mwexec2($cmd,$output,$retval);
 					if($retval == 0):
-						header('Location: cbsd_manager_gui.php');
+						header('Location: cbsd_bmanager_gui.php');
 						exit;
 					else:
 						$input_errors[] = gtext("Failed to set no-auto.");
@@ -105,7 +105,7 @@ if($_POST):
 						$cmd = ("/usr/local/bin/cbsd bdestroy {$item}");
 						unset($output,$retval);mwexec2($cmd,$output,$retval);
 						if($retval == 0):
-							header('Location: cbsd_manager_gui.php');
+							header('Location: cbsd_bmanager_gui.php');
 							exit;
 						else:
 							$input_errors[] = gtext("Failed to destroy VM, make sure this container is stopped.");
@@ -181,12 +181,12 @@ $document->
 	add_area_tabnav()->
 		push()->
 		add_tabnav_upper()->
-			ins_tabnav_record('cbsd_manager_gui.php',gettext('VM'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_info.php',gettext('Information'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_maintenance.php',gettext('Maintenance'),gettext('Reload page'),true);
+			ins_tabnav_record('cbsd_bmanager_gui.php',gettext('VM'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_info.php',gettext('Information'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_maintenance.php',gettext('Maintenance'),gettext('Reload page'),true);
 $document->render();
 ?>
-<form action="cbsd_manager_util.php" method="post" name="iform" id="iform"><table id="area_data"><tbody><tr><td id="area_data_frame">
+<form action="cbsd_bmanager_util.php" method="post" name="iform" id="iform"><table id="area_data"><tbody><tr><td id="area_data_frame">
 <?php
 	global $sphere_notifier;
 	if(!empty($errormsg)):

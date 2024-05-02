@@ -28,7 +28,7 @@ EXTENSION_ROOT=$( realpath /usr/local/www/ext/cbsd-bhyve )
 [ ! -d "${EXTENSION_ROOT}" ] && err 1 "error: not directory: ${EXTENSION_ROOT} ?"
 
 # check for cbsd-bhyve specific files
-[ ! -f "${EXTENSION_ROOT}/gui/cbsd_manager_gui.php" ] && err 1 "error: no such cbsd-bhyve specific file: ${EXTENSION_ROOT}/gui/cbsd_manager_gui.php"
+[ ! -f "${EXTENSION_ROOT}/gui/cbsd_bmanager_gui.php" ] && err 1 "error: no such cbsd-bhyve specific file: ${EXTENSION_ROOT}/gui/cbsd_bmanager_gui.php"
 
 cd /tmp
 UPGRADE_ROOT=$( /usr/bin/mktemp -d )
@@ -57,7 +57,7 @@ echo "Unpacking the tarball..." | tee -a /var/log/cbsd-upgrade.log
 echo "Done!" | tee -a /var/log/cbsd-upgrade.log
 /bin/rm main.zip
 
-[ ! -r "${UPGRADE_ROOT}/ver" -a ! -r "${UPGRADE_ROOT}/gui/cbsd_manager-lib.inc" ] && err 1 "no such ${UPGRADE_ROOT}/ver and ${UPGRADE_ROOT}/gui/cbsd_manager-lib.inc: wrong hier ?"
+[ ! -r "${UPGRADE_ROOT}/ver" -a ! -r "${UPGRADE_ROOT}/gui/cbsd_bmanager-lib.inc" ] && err 1 "no such ${UPGRADE_ROOT}/ver and ${UPGRADE_ROOT}/gui/cbsd_bmanager-lib.inc: wrong hier ?"
 
 /usr/local/bin/rsync -avz --exclude .git --exclude log --exclude conf --exclude bin --exclude pubkey --exclude utils/upgrade --delete ${UPGRADE_ROOT}/ ${EXTENSION_ROOT}/ 2>/dev/null | tee -a /var/log/cbsd-upgrade.log
 

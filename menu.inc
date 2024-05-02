@@ -1,1 +1,1 @@
-<a href="cbsd_manager_gui.php">CBSD bhyve</a>
+<a href="cbsd_bmanager_gui.php">CBSD bhyve</a>

@@ -1,10 +1,10 @@
 <?php
 require_once 'auth.inc';
 require_once 'guiconfig.inc';
-require_once 'cbsd_manager-lib.inc';
+require_once 'cbsd_bmanager-lib.inc';
 
 $sphere_scriptname = basename(__FILE__);
-$sphere_scriptname_child = 'cbsd_manager_util.php';
+$sphere_scriptname_child = 'cbsd_bmanager_util.php';
 $sphere_header = 'Location: '.$sphere_scriptname;
 $sphere_header_parent = $sphere_header;
 $sphere_array = [];
@@ -42,7 +42,7 @@ $sphere_array = $jls_list;
 if(empty($cbsd_version)):
 	$errormsg = gtext('cbsd Initial Configuration:')
 			. ' '
-			. '<a href="' . 'cbsd_manager_config.php' . '">'
+			. '<a href="' . 'cbsd_bmanager_config.php' . '">'
 			. gtext('Please check and configure CBSD workdir/network first.')
 			. '</a>'
 			. '</br>';
@@ -175,12 +175,12 @@ $document->
 	add_area_tabnav()->
 		push()->
 		add_tabnav_upper()->
-			ins_tabnav_record('cbsd_manager_gui.php',gettext('VM'))->
-			ins_tabnav_record('cbsd_manager_info.php',gettext('Information'))->
-			ins_tabnav_record('cbsd_manager_maintenance.php',gettext('Maintenance'));
+			ins_tabnav_record('cbsd_bmanager_gui.php',gettext('VM'))->
+			ins_tabnav_record('cbsd_bmanager_info.php',gettext('Information'))->
+			ins_tabnav_record('cbsd_bmanager_maintenance.php',gettext('Maintenance'));
 $document->render();
 ?>
-<form action="cbsd_manager_gui.php" method="post" name="iform" id="iform"><table id="area_data"><tbody><tr><td id="area_data_frame">
+<form action="cbsd_bmanager_gui.php" method="post" name="iform" id="iform"><table id="area_data"><tbody><tr><td id="area_data_frame">
 <?php
 	global $sphere_notifier;
 	if(!empty($errormsg)):
@@ -324,7 +324,7 @@ $document->render();
 				else:
 ?>
 					<td class="lceadd">
-						<a href="cbsd_manager_add.php"><img src="<?=$img_path['add'];?>" title="<?=$gt_record_add;?>" border="0" alt="<?=$gt_record_add;?>" class="spin oneemhigh"/></a>
+						<a href="cbsd_bmanager_add.php"><img src="<?=$img_path['add'];?>" title="<?=$gt_record_add;?>" border="0" alt="<?=$gt_record_add;?>" class="spin oneemhigh"/></a>
 					</td>
 <?php
 				endif;

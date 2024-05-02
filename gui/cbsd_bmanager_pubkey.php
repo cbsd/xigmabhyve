@@ -1,7 +1,7 @@
 <?php
 require_once 'auth.inc';
 require_once 'guiconfig.inc';
-require_once("cbsd_manager-lib.inc");
+require_once("cbsd_bmanager-lib.inc");
 
 $pgtitle = [gtext("Extensions"), gtext('CBSD'),gtext('Pubkey')];
 
@@ -38,7 +38,7 @@ if($_POST):
 	$pconfig = $_POST;
 
 	if(isset($_POST['Cancel']) && $_POST['Cancel']):
-		header('Location: cbsd_manager_gui.php');
+		header('Location: cbsd_bmanager_gui.php');
 		exit;
 	endif;
 
@@ -59,7 +59,7 @@ if($_POST):
 				unlink("{$rootfolder}/pubkey/default");
 			endif;
 		endif;
-		header('Location: cbsd_manager_gui.php');
+		header('Location: cbsd_bmanager_gui.php');
 	endif;
 endif;
 
@@ -83,16 +83,16 @@ $document->
 	add_area_tabnav()->
 		push()->
 		add_tabnav_upper()->
-			ins_tabnav_record('cbsd_manager_gui.php',gettext('VM'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_info.php',gettext('Information'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_maintenance.php',gettext('Maintenance'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_gui.php',gettext('VM'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_info.php',gettext('Information'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_maintenance.php',gettext('Maintenance'),gettext('Reload page'),true)->
 		pop()->add_tabnav_lower()->
-			ins_tabnav_record('cbsd_manager_config.php',gettext('CBSD Configuration'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_golds.php',gettext('Gold Images'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_pubkey.php',gettext('Pubkey'),gettext('Reload page'),true);
+			ins_tabnav_record('cbsd_bmanager_config.php',gettext('CBSD Configuration'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_golds.php',gettext('Gold Images'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_pubkey.php',gettext('Pubkey'),gettext('Reload page'),true);
 $document->render();
 ?>
-<form action="cbsd_manager_pubkey.php" method="post" name="iform" id="iform"><table id="area_data"><tbody><tr><td id="area_data_frame">
+<form action="cbsd_bmanager_pubkey.php" method="post" name="iform" id="iform"><table id="area_data"><tbody><tr><td id="area_data_frame">
 <?php
 	if(!empty($errormsg)):
 		print_error_box($errormsg);

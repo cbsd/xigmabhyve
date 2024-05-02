@@ -1,7 +1,7 @@
 <?php
 require("auth.inc");
 require("guiconfig.inc");
-require_once("cbsd_manager-lib.inc");
+require_once("cbsd_bmanager-lib.inc");
 
 $pgtitle = array(gtext("Extensions"), "CBSD", "Maintenance");
 
@@ -76,13 +76,13 @@ $(document).ready(function(){
 }
 //-->
 </script>
-<form action="cbsd_manager_maintenance.php" method="post" name="iform" id="iform" onsubmit="spinner()">
+<form action="cbsd_bmanager_maintenance.php" method="post" name="iform" id="iform" onsubmit="spinner()">
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr><td class="tabnavtbl">
 		<ul id="tabnav">
-			<li class="tabinact"><a href="cbsd_manager_gui.php"><span><?=gettext("VM");?></span></a></li>
-				<li class="tabact"><a href="cbsd_manager_info.php"><span><?=gettext("Information");?></span></a></li>
-			<li class="tabact"><a href="cbsd_manager_maintenance.php"><span><?=gettext("Maintenance");?></span></a></li>
+			<li class="tabinact"><a href="cbsd_bmanager_gui.php"><span><?=gettext("VM");?></span></a></li>
+				<li class="tabact"><a href="cbsd_bmanager_info.php"><span><?=gettext("Information");?></span></a></li>
+			<li class="tabact"><a href="cbsd_bmanager_maintenance.php"><span><?=gettext("Maintenance");?></span></a></li>
 		</ul>
 	</td></tr>
 		<tr><td class="tabnavtbl">
@@ -90,9 +90,9 @@ $(document).ready(function(){
 if(!empty($cbsd_version)):
 ?>
 		<ul id="tabnav2">
-			<li class="tabact"><a href="cbsd_manager_config.php"><span><?=gettext("CBSD Configuration");?></span></a></li>
-			<li class="tabact"><a href="cbsd_manager_golds.php"><span><?=gettext("Gold Images");?></span></a></li>
-			<li class="tabact"><a href="cbsd_manager_pubkey.php"><span><?=gettext("Pubkey");?></span></a></li>
+			<li class="tabact"><a href="cbsd_bmanager_config.php"><span><?=gettext("CBSD Configuration");?></span></a></li>
+			<li class="tabact"><a href="cbsd_bmanager_golds.php"><span><?=gettext("Gold Images");?></span></a></li>
+			<li class="tabact"><a href="cbsd_bmanager_pubkey.php"><span><?=gettext("Pubkey");?></span></a></li>
 		</ul>
 <?php
 endif;

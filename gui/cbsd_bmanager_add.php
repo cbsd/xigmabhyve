@@ -1,7 +1,7 @@
 <?php
 require_once 'auth.inc';
 require_once 'guiconfig.inc';
-require_once("cbsd_manager-lib.inc");
+require_once("cbsd_bmanager-lib.inc");
 
 global $configfile;
 global $workdir;
@@ -57,7 +57,7 @@ endif;
 if(!file_exists("{$workdir}/cmd.subr")):
 	$errormsg = gtext('CBSD workdir not initialized yet.')
 			. ' '
-			. '<a href="' . 'cbsd_manager_config.php' . '">'
+			. '<a href="' . 'cbsd_bmanager_config.php' . '">'
 			. gtext('Please init CBSD workdir first.')
 			. '</a>';
 		$prerequisites_ok = false;
@@ -65,7 +65,7 @@ else:
 	if(!get_all_release_list()):
 		$errormsg = gtext('No gold images downloaded yet.')
 				. ' '
-				. '<a href="' . 'cbsd_manager_golds.php' . '">'
+				. '<a href="' . 'cbsd_bmanager_golds.php' . '">'
 				. gtext('Please download a image first.')
 				. '</a>';
 			$prerequisites_ok = false;
@@ -74,7 +74,7 @@ else:
 	if(!get_all_pubkey_list()):
 		$errormsg = gtext('No public key added yet.')
 				. ' '
-				. '<a href="' . 'cbsd_manager_pubkey.php' . '">'
+				. '<a href="' . 'cbsd_bmanager_pubkey.php' . '">'
 				. gtext('Please add public key first.')
 				. '</a>';
 			$prerequisites_ok = false;
@@ -87,7 +87,7 @@ if($_POST):
 	unset($input_errors);
 	$pconfig = $_POST;
 	if(isset($_POST['Cancel']) && $_POST['Cancel']):
-		header('Location: cbsd_manager_gui.php');
+		header('Location: cbsd_bmanager_gui.php');
 		exit;
 	endif;
 	if(isset($_POST['Create']) && $_POST['Create']):
@@ -126,7 +126,7 @@ if($_POST):
 			if(get_all_release_list()):
 				unset($output,$retval);mwexec2($cmd,$output,$retval);
 				if($retval == 0):
-					header('Location: cbsd_manager_gui.php');
+					header('Location: cbsd_bmanager_gui.php');
 					exit;
 				else:
 					$errormsg .= gtext("Failed to create VM.");
@@ -154,12 +154,12 @@ $document->
 	add_area_tabnav()->
 		push()->
 		add_tabnav_upper()->
-			ins_tabnav_record('cbsd_manager_gui.php',gettext('VM'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_info.php',gettext('Information'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_maintenance.php',gettext('Maintenance'),gettext('Reload page'),true);
+			ins_tabnav_record('cbsd_bmanager_gui.php',gettext('VM'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_info.php',gettext('Information'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_maintenance.php',gettext('Maintenance'),gettext('Reload page'),true);
 $document->render();
 ?>
-<form action="cbsd_manager_add.php" method="post" name="iform" id="iform"><table id="area_data"><tbody><tr><td id="area_data_frame">
+<form action="cbsd_bmanager_add.php" method="post" name="iform" id="iform"><table id="area_data"><tbody><tr><td id="area_data_frame">
 <?php
 	if(!empty($errormsg)):
 		print_error_box($errormsg);
@@ -223,7 +223,7 @@ $document->render();
 				$pconfig['release'] = exec("/usr/bin/grep '^last_release_created=' {$configfile} 2>/dev/null | /usr/bin/cut -d'\"' -f2");
 			endif;
 
-			html_combobox2('release',gettext('Profile name'),array_key_exists($pconfig['release'] ?? '',$b_action) ? $pconfig['release'] : $default_options ,$b_action,'<a href="cbsd_manager_golds.php"><span>Warm more (Gold image libraries)</span></a>',true,false,'type_change()');
+			html_combobox2('release',gettext('Profile name'),array_key_exists($pconfig['release'] ?? '',$b_action) ? $pconfig['release'] : $default_options ,$b_action,'<a href="cbsd_bmanager_golds.php"><span>Warm more (Gold image libraries)</span></a>',true,false,'type_change()');
 			html_combobox2('pubkey',  gettext('Pubkey'),!empty($pconfig['pubkey']),$c_action,"{$pubkey_comment}",true,false);
 			html_checkbox2('nowstart',gettext('Start after creation'),!empty($pconfig['nowstart']) ? true : false,gettext('Start the VM after creation(May be overridden by later cbsd releases).'),'',false);
 			html_checkbox2('autostart',gettext('Auto start on boot'),!empty($pconfig['autostart']) ? true : false,gettext('Automatically start the VM at boot time.'),'',false);

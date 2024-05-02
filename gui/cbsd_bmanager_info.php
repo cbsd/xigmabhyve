@@ -1,7 +1,7 @@
 <?php
 require_once 'auth.inc';
 require_once 'guiconfig.inc';
-require_once("cbsd_manager-lib.inc");
+require_once("cbsd_bmanager-lib.inc");
 
 function cbsd_summary(string $entity_name = NULL) {
 	$cmd = '/usr/local/bin/cbsd summary && /usr/local/bin/cbsd cpu-topology && /usr/local/bin/cbsd bls';
@@ -18,9 +18,9 @@ $document->
 	add_area_tabnav()->
 		push()->
 		add_tabnav_upper()->
-			ins_tabnav_record('cbsd_manager_gui.php',gettext('VM'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_info.php',gettext('Information'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_maintenance.php',gettext('Maintenance'),gettext('Reload page'),true);
+			ins_tabnav_record('cbsd_bmanager_gui.php',gettext('VM'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_info.php',gettext('Information'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_maintenance.php',gettext('Maintenance'),gettext('Reload page'),true);
 $document->render();
 ?>
 

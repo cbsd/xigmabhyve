@@ -1,7 +1,7 @@
 <?php
 require_once 'auth.inc';
 require_once 'guiconfig.inc';
-require_once("cbsd_manager-lib.inc");
+require_once("cbsd_bmanager-lib.inc");
 
 $pgtitle = [gtext("Extensions"), gtext('CBSD'),gtext('Pubkey')];
 
@@ -70,7 +70,7 @@ if($_POST):
 	$pconfig = $_POST;
 
 	if(isset($_POST['Cancel']) && $_POST['Cancel']):
-		header('Location: cbsd_manager_gui.php');
+		header('Location: cbsd_bmanager_gui.php');
 		exit;
 	endif;
 
@@ -122,7 +122,7 @@ if($_POST):
 		$output = [];
 		exec("{$rootfolder}/utils/init",$output,$return_val);
 		if($return_val == 0):
-			header('Location: cbsd_manager_gui.php');
+			header('Location: cbsd_bmanager_gui.php');
 			exit;
 		else:
 			unset($input_errors);
@@ -158,16 +158,16 @@ $document->
 	add_area_tabnav()->
 		push()->
 		add_tabnav_upper()->
-			ins_tabnav_record('cbsd_manager_gui.php',gettext('VM'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_info.php',gettext('Information'),gettext('Reload page'),true)->
-			ins_tabnav_record('cbsd_manager_maintenance.php',gettext('Maintenance'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_gui.php',gettext('VM'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_info.php',gettext('Information'),gettext('Reload page'),true)->
+			ins_tabnav_record('cbsd_bmanager_maintenance.php',gettext('Maintenance'),gettext('Reload page'),true)->
 			pop()->add_tabnav_lower()->
-				ins_tabnav_record('cbsd_manager_config.php',gettext('CBSD Configuration'),gettext('Reload page'),true)->
-				ins_tabnav_record('cbsd_manager_golds.php',gettext('Gold Images'),gettext('Reload page'),true)->
-				ins_tabnav_record('cbsd_manager_pubkey.php',gettext('Pubkey'),gettext('Reload page'),true);
+				ins_tabnav_record('cbsd_bmanager_config.php',gettext('CBSD Configuration'),gettext('Reload page'),true)->
+				ins_tabnav_record('cbsd_bmanager_golds.php',gettext('Gold Images'),gettext('Reload page'),true)->
+				ins_tabnav_record('cbsd_bmanager_pubkey.php',gettext('Pubkey'),gettext('Reload page'),true);
 $document->render();
 ?>
-<form action="cbsd_manager_config.php" method="post" name="iform" id="iform"><table id="area_data"><tbody><tr><td id="area_data_frame">
+<form action="cbsd_bmanager_config.php" method="post" name="iform" id="iform"><table id="area_data"><tbody><tr><td id="area_data_frame">
 <?php
 	if(!empty($errormsg)):
 		print_error_box($errormsg);
@@ -199,8 +199,8 @@ $document->render();
 			html_combobox2('cbsd_iface',gettext('VM interface name'),$pconfig['cbsd_iface'] ?? '',[ 'cbsd0' => 'cbsd0' ],'(current version supports only one network interface)',true,false,'type_change()');
 			html_inputbox2('cbsd_gw4',gettext('Init IP on cbsd_iface (GW4 for VM)'),$pconfig['cbsd_gw4'],'',true,15);
 			html_inputbox2('cbsd_net',gettext('Network for VM, e.g: 10.0.0.0/24 or 10.0.0.1-50'),$pconfig['cbsd_net'],'',true,30);
-			html_checkbox2('cbsd_nat',gettext('Enable NAT via CBSD/pf ?'),!empty($pconfig['cbsd_nat']) ? true : false,'','(learn: <a href="cbsd_manager_info.php">Arhcitecture Info</a>)',false);
-			html_checkbox2('cbsd_rdr',gettext('Redirect 22 (when SSH) and/or 3389 (when RDP) port from XigmaNAS external IP / free port (auto) to VM'),!empty($pconfig['cbsd_rdr']) ? true : false,'','(learn: <a href="cbsd_manager_info.php">Arhcitecture Info</a>)',false);
+			html_checkbox2('cbsd_nat',gettext('Enable NAT via CBSD/pf ?'),!empty($pconfig['cbsd_nat']) ? true : false,'','(learn: <a href="cbsd_bmanager_info.php">Arhcitecture Info</a>)',false);
+			html_checkbox2('cbsd_rdr',gettext('Redirect 22 (when SSH) and/or 3389 (when RDP) port from XigmaNAS external IP / free port (auto) to VM'),!empty($pconfig['cbsd_rdr']) ? true : false,'','(learn: <a href="cbsd_bmanager_info.php">Arhcitecture Info</a>)',false);
 ?>
 		</tbody>
 	</table>
