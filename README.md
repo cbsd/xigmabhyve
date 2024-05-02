@@ -2,6 +2,7 @@
 
  This is the XigmaNAS CBSD Extension for quickly create and manage bhyve VMs.
 
+![image](https://github.com/cbsd/xigmabhyve/assets/926409/82542ff8-557b-4ea0-a86f-9f00d38dffd9)
 
 
 **Installation**
