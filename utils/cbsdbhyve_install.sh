@@ -24,12 +24,13 @@ if [ ! -x "${CBSD_CMD}" ]; then
 	# official releases
 	#env SIGNATURE_TYPE=none ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg install -y tmux cbsd ttyd
 
-	env SIGNATURE_TYPE=none ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg install -y sudo libssh2 rsync jq sqlite3 tmux ttyd cbsd
 	# for devel
-	#rootfs_url="https://convectix.com/DL/xigma/${majorver}/cbsd-14.0.9.a.pkg"
-	#fetch -o cbsd.pkg ${rootfs_url}
-	#pkg install -y ./cbsd.pkg
-	#rm -f ./cbsd.pkg
+	env SIGNATURE_TYPE=none ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg install -y sudo libssh2 rsync jq sqlite3 tmux ttyd
+	# for development version
+	rootfs_url="https://convectix.com/DL/xigma/${majorver}/cbsd-14.1.4.pkg"
+	fetch -o cbsd.pkg ${rootfs_url}
+	pkg install -y ./cbsd.pkg
+	rm -f ./cbsd.pkg
 	pkg clean -ya
 fi
 
