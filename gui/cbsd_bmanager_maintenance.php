@@ -122,7 +122,7 @@ endif;
 			</div>
 			<div id="remarks">
 				<?php html_remark("note", gtext("Info"), sprintf(gtext("For general information visit the following link(s):")));?>
-				<div id="enumeration"><ul><li><a href="https://www.bsdstore.ru/en/" target="_blank" ><?=gtext("CBSD framework.")?></a></li></ul></div>
+				<div id="enumeration"><ul><li><a href="https://github.com/cbsd/cbsd" target="_blank" ><?=gtext("CBSD framework.")?></a></li></ul></div>
 			</div>
 			<table width="100%" border="0" cellpadding="6" cellspacing="0">
 				<?php html_separator();?>

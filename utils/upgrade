@@ -79,7 +79,7 @@ if [ ! -x ${EXTENSION_ROOT}/bin/sbin/pfctl ]; then
 	echo "Fetch system binary dependencies for FreeBSD ${majorver} [${EXTENSION_ROOT}]..." | tee -a /var/log/cbsd-upgrade.log
 
 	cd ${EXTENSION_ROOT}
-	rootfs_url="https://www.bsdstore.ru/downloads/xigma/${majorver}/xigma-rootfs.tgz"
+	rootfs_url="https://convectix.com/DL/${majorver}/xigma-rootfs.tgz"
 	fetch ${rootfs_url} | tee -a /var/log/cbsd-upgrade.log
 	[ ! -s ${EXTENSION_ROOT}/xigma-rootfs.tgz ] && err 1 "unable to fetch ${rootfs_url}: no such ${EXTENSION_ROOT}/xigma-rootfs.tgz"
 	tar xfz xigma-rootfs.tgz && rm -f xigma-rootfs.tgz
