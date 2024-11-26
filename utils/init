@@ -22,20 +22,20 @@ if [ ! -x "${EXTENSION_ROOT}/bin/sbin/pfctl" ]; then
 fi
 
 # rc.d
-rcd_update=0
-if [ -r "${MY_PATH}/../rc.d/cbsdd" ]; then
-	if [ -r "/usr/local/etc/rc.d/cbsdd" ]; then
-		is_diff=$( diff "/usr/local/etc/rc.d/cbsdd" "${MY_PATH}/../rc.d/cbsdd" )
-		[ -n "${is_diff}" ] && rcd_update="1"
-	else
-		rcd_update="1"
-	fi
-fi
+#rcd_update=0
+#if [ -r "${MY_PATH}/../rc.d/cbsdd" ]; then
+#	if [ -r "/usr/local/etc/rc.d/cbsdd" ]; then
+#		is_diff=$( diff "/usr/local/etc/rc.d/cbsdd" "${MY_PATH}/../rc.d/cbsdd" )
+#		[ -n "${is_diff}" ] && rcd_update="1"
+#	else
+#		rcd_update="1"
+#	fi
+#fi
 
-if [ "${rcd_update}" = "1" ]; then
-	cp -a "${MY_PATH}/../rc.d/cbsdd" /usr/local/etc/rc.d/cbsdd
-	chmod +x /usr/local/etc/rc.d/cbsdd
-fi
+#if [ "${rcd_update}" = "1" ]; then
+#	cp -a "${MY_PATH}/../rc.d/cbsdd" /usr/local/etc/rc.d/cbsdd
+#	chmod +x /usr/local/etc/rc.d/cbsdd
+#fi
 
 # module conflict
 for i in vboxdrv vboxnetadp vboxnetflt; do
