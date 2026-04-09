@@ -201,7 +201,7 @@ sysrc -qf /tmp/initenv.conf nodeippool="${NET}" \
 	nodeip="${natip}" \
 	natip="${natip}" \
 	ipfw_enable="0" \
-	post_cbsd_cmd_path="${EXTENSION_ROOT}/bin/sbin:${EXTENSION_ROOT}/bin/usr/bin:${EXTENSION_ROOT}/bin/usr/sbin" \
+	post_cbsd_cmd_path="${EXTENSION_ROOT}/bin" \
 	workdir="${WORKDIR}" | tee -a /var/log/cbsd-init.log
 
 /usr/local/cbsd/sudoexec/initenv /tmp/initenv.conf 2>&1 | tee -a /var/log/cbsd-init.log
