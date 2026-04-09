@@ -116,7 +116,7 @@ if($_POST):
 			$astart="0";
 		endif;
 
-		$cmd = "/usr/local/bin/cbsd bcreate jname={$jname} astart={$astart} vm_ram={$ram} vm_cpus={$cpu} vm_os_type={$vm_os_type} vm_os_profile={$vm_os_profile} imgsize={$imgsize} bhyve_vnc_tcp_bind={$vnc_bind} ci_ip4_addr={$ipaddr} ci_user_pubkey=\".ssh/authorized_keys\" ci_user_pubkey2=\"{$rootfolder}/pubkey/default\"";
+		$cmd = "/usr/local/bin/cbsd bcreate jname={$jname} astart={$astart} vm_ram={$ram} vm_cpus={$cpu} vm_os_type={$vm_os_type} vm_os_profile={$vm_os_profile} imgsize={$imgsize} bhyve_vnc_tcp_bind={$vnc_bind} ci_ip4_addr={$ipaddr} ci_user_pubkey=\".ssh/id_rsa.pub\" ci_user_pubkey2=\"{$rootfolder}/pubkey/default\"";
 
 		if (isset($_POST['nowstart'])):
 			$cmd .= " runasap=1";
