@@ -204,7 +204,10 @@ sysrc -qf /tmp/initenv.conf nodeippool="${NET}" \
 	post_cbsd_cmd_path="${EXTENSION_ROOT}/bin" \
 	workdir="${WORKDIR}" | tee -a /var/log/cbsd-init.log
 
-/usr/local/cbsd/sudoexec/initenv /tmp/initenv.conf 2>&1 | tee -a /var/log/cbsd-init.log
+cd /usr/local/cbsd/sudoexec/ && patch --check -N < /mnt/ext/cbsd-bhyve/utils/initenv.patch > /dev/null 2>&1
+[ $? -eq 0 ] && echo "${N1_COLOR}apply initenv.patch" && patch < /mnt/ext/cbsd-bhyve/utils/initenv.patch
+
+env cbsd_workdir=${WORKDIR} /usr/local/cbsd/sudoexec/initenv /tmp/initenv.conf 2>&1 | tee -a /var/log/cbsd-init.log
 
 cbsd_version=$( /usr/local/bin/cbsd version 2>&1 )
 ret=$?

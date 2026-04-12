@@ -1,0 +1,10 @@
+--- initenv.orig	2026-04-12 21:01:33.512334000 +0000
++++ initenv	2026-04-12 22:01:56.702777000 +0000
+@@ -452,7 +452,6 @@
+ 	#. ${CIX_DISTDIR}/cbsd.conf
+ 
+ 	[ -z "${cbsd_workdir}" -a -r /etc/rc.conf ] && . /etc/rc.conf
+-	[ -n "${oworkdir}" ] && cbsd_workdir="${oworkdir}"
+ 	[ -z "${cbsd_workdir}" ] && cbsd_workdir="/usr/jails"
+ 
+ 	if [ -r "${cbsd_workdir}/nc.inventory" ]; then
